@@ -106,8 +106,7 @@ func sourcesFromConfig(ctx context.Context, cfg *config.Config) []CertificateSou
 
 // FromTrustedRoot loads Fulcio CAs from a sigstore-go trusted_root.json file,
 // returning every root and intermediate certificate across all configured
-// Fulcio certificate authorities. Errors are returned to the caller, which
-// will fall through to the next CertificateSource (typically TUF).
+// Fulcio certificate authorities.
 func FromTrustedRoot(path string) CertificateSource {
 	return func() ([]*x509.Certificate, error) {
 		tr, err := sgroot.NewTrustedRootFromPath(path)

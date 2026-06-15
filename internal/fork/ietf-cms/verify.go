@@ -170,15 +170,14 @@ func (sd *SignedData) verify(econtent []byte, opts x509.VerifyOptions, tsOpts x5
 			}
 
 			// Check the TSA's recorded signing time against the cert validity
-			// window using GenTime directly, and treat the window as inclusive
-			// on both ends (NotBefore <= GenTime <= NotAfter is valid).
-			// tsti.Before/After pad GenTime by tsti.Accuracy, and that padding
-			// produces false negatives on ephemeral Fulcio certs (~10min) when
-			// small clock skew between Fulcio and the TSA pushes the padded
-			// bound a few seconds outside the window. cert.Verify below
-			// enforces the same window against GenTime; this check stays so a
-			// TSA token claiming a time outside the cert validity window is
-			// rejected with a clear message.
+			// window using GenTime directly, with inclusive bounds
+			// (NotBefore <= GenTime <= NotAfter is valid). tsti.Before/After
+			// pad GenTime by tsti.Accuracy, which produces false negatives on
+			// ephemeral Fulcio certs (~10min) when small clock skew between
+			// Fulcio and the TSA pushes the padded bound a few seconds outside
+			// the window. cert.Verify below enforces the same window against
+			// GenTime; this check stays so a TSA token claiming a time outside
+			// the cert validity window is rejected with a clear message.
 			if tsti.GenTime.After(cert.NotAfter) || tsti.GenTime.Before(cert.NotBefore) {
 				return nil, x509.CertificateInvalidError{Cert: cert, Reason: x509.Expired, Detail: "timestamp authority verification failed"}
 			}
